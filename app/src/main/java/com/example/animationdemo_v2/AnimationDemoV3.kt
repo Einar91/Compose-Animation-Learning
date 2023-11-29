@@ -1,6 +1,8 @@
 package com.example.animationdemo_v2
 
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.calculateTargetValue
+import androidx.compose.animation.rememberSplineBasedDecay
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.rememberDraggableState
@@ -39,7 +41,9 @@ import kotlinx.coroutines.launch
  * dra elementet ut av skjermen.
  * - Vi kunne også ha ignorert drag amounts som får oss over eller under thresholdet som vil tillater
  *
- *
+ * For en fling gesture så må vi kalkulere den nåværedne velocity av en gesture og bruke den til å
+ * avgjøre hva som skjer når dra gesturen slutter.
+ * - rememberSplineBasedDecay() bruker vi til å kalkulere current velocity av en gesture
  */
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -67,10 +71,23 @@ fun AnimationDemoV3(
             }
         })
 
+        val decay = rememberSplineBasedDecay<Float>()
+
+        val toggleDrawerState: () -> Unit = {
+            corutineScope.launch {
+                drawerState = if (drawerState == DrawerValue.Open) {
+                    translationX.animateTo(0f)
+                    DrawerValue.Closed
+                } else {
+                    translationX.animateTo(drawerWidth)
+                    DrawerValue.Open
+                }
+            }
+        }
 
         HomeScreenDrawer()
         ScreenContents(
-            onMenuClick = { drawerState = if (drawerState == DrawerValue.Closed) DrawerValue.Open else DrawerValue.Closed },
+            onMenuClick = toggleDrawerState,
             modifier = Modifier
                 .graphicsLayer {
                     this.translationX = translationX.value
@@ -84,8 +101,44 @@ fun AnimationDemoV3(
                     this.shape = RoundedCornerShape(cornerSize)
 
                 }
-                .draggable(draggableState, Orientation.Horizontal)
+                .draggable(draggableState, Orientation.Horizontal,
+                    onDragStopped = { velocity ->
+                        // Kalkuler current velocity
+                        val decayX = decay.calculateTargetValue(
+                            translationX.value,
+                            velocity
+                        )
+                        // Avgjør hvilken tilstand den går til
+                        corutineScope.launch {
+                            val targetX = if (decayX > drawerWidth * 0.5) drawerWidth else 0f
+                            val canReachTargetWithDecay = (decayX > targetX && targetX == drawerWidth)
 
+                            /**
+                             * Om decayX er forbi midtpunktet, så vet vi at endepunktet/drawerWidth
+                             * er der den vil ende opp.
+                             * - Om decayX går forbi drawerWidth, så kan vi naturlig nå målet med
+                             *   decay. Vi trenger ikke videre animasjon.
+                             * - Om kommer rett forbi midtpunktet, så bruker vi animateTo som vil
+                             *   ta seg av å øke eller minke velocity for å komme til ønsket mål
+                             *   (start eller sluttpunkt)
+                             */
+                            if (canReachTargetWithDecay) {
+                                translationX.animateDecay(
+                                    initialVelocity = velocity,
+                                    animationSpec = decay
+                                )
+                            } else {
+                                translationX.animateTo(targetX, initialVelocity = velocity)
+                            }
+
+                            // Oppdater drawerState
+                            drawerState = if (targetX == drawerWidth) {
+                                DrawerValue.Open
+                            } else {
+                                DrawerValue.Closed
+                            }
+                        }
+                    })
         )
     }
 }

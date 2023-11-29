@@ -63,7 +63,12 @@ fun AnimationDemoV4(
                 anchors = anchors,
                 positionalThreshold = { distance: Float -> distance * 0.5f },
                 animationSpec = spring(),
-                velocityThreshold = { with(density) { 80.dp.toPx() } }
+                velocityThreshold = { with(density) { 80.dp.toPx() } },
+                confirmValueChange = { draw ->
+                    drawerState = draw
+                    true
+                }
+
             )
         }
 

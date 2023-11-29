@@ -34,6 +34,12 @@ import kotlinx.coroutines.launch
  * I rememberDraggableState bruker vi .snapTo siden vi ikke ønsker noen animasjon når bruker
  * interagerer med en gesture. Vi bruker så .draggable modifieren med en restriksjon på kun
  * horisontal bevegelse.
+ *
+ * Vi bruker translationX.updateBounds() for å sette en øvre og nedre grense slik at vi ikke kan
+ * dra elementet ut av skjermen.
+ * - Vi kunne også ha ignorert drag amounts som får oss over eller under thresholdet som vil tillater
+ *
+ *
  */
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -53,6 +59,7 @@ fun AnimationDemoV3(
         val translationX = remember {
             Animatable(0f)
         }
+        translationX.updateBounds(0f, drawerWidth)
 
         val draggableState = rememberDraggableState(onDelta = { dragAmount ->
             corutineScope.launch {
@@ -74,7 +81,7 @@ fun AnimationDemoV3(
 
                     val cornerSize = lerp(0.dp, 32.dp, translationX.value / drawerWidth)
                     this.clip = true
-                    this.shape = RoundedCornerShape(if (cornerSize >= 0.dp) cornerSize else 0.dp)
+                    this.shape = RoundedCornerShape(cornerSize)
 
                 }
                 .draggable(draggableState, Orientation.Horizontal)

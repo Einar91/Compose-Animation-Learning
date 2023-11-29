@@ -3,6 +3,7 @@ package com.example.animationdemo_v2
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -19,7 +20,8 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun ScreenContents(
     onMenuClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    content: @Composable() (ColumnScope.() -> Unit) = {}
 ) {
     Box(
         modifier = modifier
@@ -35,6 +37,7 @@ fun ScreenContents(
                 ),
             ) {
                 Icon(Icons.Outlined.Menu, contentDescription = "menu")
+                content()
             }
         }
     }

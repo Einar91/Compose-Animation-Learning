@@ -1,4 +1,4 @@
-package com.example.animationdemo_v2
+package com.example.animationdemo_v2.animations
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.calculateTargetValue
@@ -22,6 +22,8 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.lerp
 import androidx.compose.ui.util.lerp
+import com.example.animationdemo_v2.HomeScreenDrawer
+import com.example.animationdemo_v2.ScreenContents
 import kotlinx.coroutines.launch
 
 /**
@@ -88,6 +90,9 @@ fun AnimationDemoV3(
         HomeScreenDrawer()
         ScreenContents(
             onMenuClick = toggleDrawerState,
+            content = {
+
+            },
             modifier = Modifier
                 .graphicsLayer {
                     this.translationX = translationX.value
@@ -112,6 +117,16 @@ fun AnimationDemoV3(
                         corutineScope.launch {
                             val targetX = if (decayX > drawerWidth * 0.5) drawerWidth else 0f
                             val canReachTargetWithDecay = (decayX > targetX && targetX == drawerWidth)
+
+                            /**
+                             * Om decayX er forbi midtpunktet, så vet vi at endepunktet/drawerWidth
+                             * er der den vil ende opp.
+                             * - Om decayX går forbi drawerWidth, så kan vi naturlig nå målet med
+                             *   decay. Vi trenger ikke videre animasjon.
+                             * - Om kommer rett forbi midtpunktet, så bruker vi animateTo som vil
+                             *   ta seg av å øke eller minke velocity for å komme til ønsket mål
+                             *   (start eller sluttpunkt)
+                             */
 
                             /**
                              * Om decayX er forbi midtpunktet, så vet vi at endepunktet/drawerWidth

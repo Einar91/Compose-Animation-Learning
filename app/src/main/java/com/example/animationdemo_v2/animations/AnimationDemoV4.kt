@@ -92,7 +92,7 @@ fun AnimationDemoV4(
 
                     val cornerSize = lerp(0.dp, 32.dp, state.requireOffset() / drawerWidth)
                     this.clip = true
-                    this.shape = RoundedCornerShape(cornerSize)
+                    this.shape = RoundedCornerShape(if (cornerSize >= 0.dp) cornerSize else 0.dp)
                 }
                 .anchoredDraggable(state, Orientation.Horizontal)
         )

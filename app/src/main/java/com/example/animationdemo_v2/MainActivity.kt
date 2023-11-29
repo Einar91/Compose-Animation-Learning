@@ -74,9 +74,12 @@ fun AnimationDemo(
                     this.translationX = if (drawerState == DrawerValue.Open) drawerWidth else 0f
                     this.scaleX = if (drawerState == DrawerValue.Open) 0.8f else 1f
                     this.scaleY = if (drawerState == DrawerValue.Open) 0.8f else 1f
+
                     val corners = if (drawerState == DrawerValue.Open) 32.dp else 0.dp
+                    this.clip = true
                     this.shape = RoundedCornerShape(corners)
                 }
+
         )
     }
 }
@@ -125,19 +128,19 @@ fun ScreenContents(
     onMenuClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .background(Color.Gray),
+    Box(
+        modifier = modifier.fillMaxSize().background(Color.Gray),
     ) {
-        IconButton(
-            onClick = onMenuClick,
-            modifier = Modifier.size(48.dp),
-            colors = IconButtonDefaults.iconButtonColors(
-                contentColor = Color.Black
-            ),
-        ) {
-            Icon(Icons.Outlined.Menu, contentDescription = "menu")
+        Column(modifier = Modifier.padding(16.dp)) {
+            IconButton(
+                onClick = onMenuClick,
+                modifier = Modifier.size(48.dp),
+                colors = IconButtonDefaults.iconButtonColors(
+                    contentColor = Color.Black
+                ),
+            ) {
+                Icon(Icons.Outlined.Menu, contentDescription = "menu")
+            }
         }
     }
 }

@@ -35,7 +35,8 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    AnimationDemoV1(Modifier.fillMaxSize())
+                    //AnimationDemoV1(Modifier.fillMaxSize())
+                    AnimationDemoV2(Modifier.fillMaxSize())
                 }
             }
         }

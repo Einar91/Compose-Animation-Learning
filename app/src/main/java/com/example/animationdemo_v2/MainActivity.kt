@@ -3,6 +3,10 @@ package com.example.animationdemo_v2
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -66,18 +70,39 @@ fun AnimationDemo(
             mutableStateOf(DrawerValue.Closed)
         }
 
+        val spec = spring<Float>(
+            dampingRatio = if (drawerState == DrawerValue.Open) Spring.DampingRatioMediumBouncy else Spring.DampingRatioNoBouncy,
+            stiffness = Spring.StiffnessLow
+        )
+
+        val translation by animateFloatAsState(
+            targetValue = if (drawerState == DrawerValue.Open) drawerWidth else 0f,
+            animationSpec = spec,
+            label = ""
+        )
+
+        val scale by animateFloatAsState(
+            targetValue = if (drawerState == DrawerValue.Open) 0.8f else 1f,
+            animationSpec = spec,
+            label = ""
+        )
+
+        val cornerSize by animateDpAsState(
+            targetValue = if (drawerState == DrawerValue.Open) 32.dp else 0.dp,
+            label = ""
+        )
+
         HomeScreenDrawer()
         ScreenContents(
             onMenuClick = { drawerState = if (drawerState == DrawerValue.Closed) DrawerValue.Open else DrawerValue.Closed },
             modifier = Modifier
                 .graphicsLayer {
-                    this.translationX = if (drawerState == DrawerValue.Open) drawerWidth else 0f
-                    this.scaleX = if (drawerState == DrawerValue.Open) 0.8f else 1f
-                    this.scaleY = if (drawerState == DrawerValue.Open) 0.8f else 1f
+                    this.translationX = translation
+                    this.scaleX = scale
+                    this.scaleY = scale
 
-                    val corners = if (drawerState == DrawerValue.Open) 32.dp else 0.dp
                     this.clip = true
-                    this.shape = RoundedCornerShape(corners)
+                    this.shape = RoundedCornerShape(cornerSize)
                 }
 
         )
@@ -129,7 +154,9 @@ fun ScreenContents(
     modifier: Modifier = Modifier
 ) {
     Box(
-        modifier = modifier.fillMaxSize().background(Color.Gray),
+        modifier = modifier
+            .fillMaxSize()
+            .background(Color.Gray),
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             IconButton(

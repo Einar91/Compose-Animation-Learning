@@ -1,6 +1,7 @@
 package com.example.animationdemo_v2
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -19,6 +20,8 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun HomeScreenDrawer(
+    navToSecond: () -> Unit = {},
+    onDismiss: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     Box(
@@ -42,12 +45,14 @@ fun HomeScreenDrawer(
             }
             Spacer(modifier = Modifier.height(8.dp))
             Surface(
-                modifier = modifier.fillMaxWidth(),
+                modifier = modifier.fillMaxWidth().clickable {
+                    navToSecond()
+                    onDismiss() },
                 shape = RoundedCornerShape(10.dp),
                 color = Color.Gray.copy(alpha = 0.8f)
             ) {
                 Text(
-                    text = "Calendar",
+                    text = "Second",
                     modifier = Modifier.padding(16.dp)
                 )
             }

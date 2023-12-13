@@ -24,8 +24,14 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.lerp
 import androidx.compose.ui.util.lerp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.example.animationdemo_v2.HomeScreen
 import com.example.animationdemo_v2.HomeScreenDrawer
 import com.example.animationdemo_v2.ScreenContents
+import com.example.animationdemo_v2.SecondScreen
 import kotlinx.coroutines.launch
 
 /**
@@ -40,7 +46,8 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun AnimationDemoV4(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    navController: NavHostController = rememberNavController(),
 ) {
     val width = LocalConfiguration.current.screenWidthDp
     val drawerWidth = width.toFloat() * 1.5f
@@ -84,7 +91,10 @@ fun AnimationDemoV4(
             }
         }
 
-        HomeScreenDrawer()
+        HomeScreenDrawer(
+            onDismiss = toggleDrawerState,
+            navToSecond = {navController.navigate("second")}
+        )
         ScreenContents(
             onMenuClick = toggleDrawerState,
             modifier = Modifier
@@ -99,7 +109,25 @@ fun AnimationDemoV4(
                     this.clip = true
                     this.shape = RoundedCornerShape(if (cornerSize >= 0.dp) cornerSize else 0.dp)
                 }
-                .anchoredDraggable(state, Orientation.Horizontal)
+                .anchoredDraggable(state, Orientation.Horizontal),
+            content = {
+                NavHost(
+                    navController = navController,
+                    startDestination = "home",
+                    modifier = modifier
+                ) {
+
+                    composable(route = "home") {
+                        HomeScreen(
+                            navToSecond = { navController.navigate("second") }
+                        )
+                    }
+                    composable(route = "second") {
+                        SecondScreen()
+                    }
+
+                }
+            }
         )
     }
 }

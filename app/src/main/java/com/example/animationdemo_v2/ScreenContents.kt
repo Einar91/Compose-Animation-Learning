@@ -16,13 +16,20 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navigation
 
 @Composable
 fun ScreenContents(
     onMenuClick: () -> Unit,
     modifier: Modifier = Modifier,
+
     content: @Composable() (ColumnScope.() -> Unit) = {}
 ) {
+
     Box(
         modifier = modifier
             .fillMaxSize()
@@ -37,8 +44,8 @@ fun ScreenContents(
                 ),
             ) {
                 Icon(Icons.Outlined.Menu, contentDescription = "menu")
-                content()
             }
+            content()
         }
     }
 }
